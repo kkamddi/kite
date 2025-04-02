@@ -1,0 +1,51 @@
+const input = document.querySelector('input[placeholder="Type your message..."][type="text"]');
+const sendBtn = document.querySelector('button[type="submit"]');
+
+const coins = [
+  "bitcoin", "ethereum", "tether", "bnb", "solana", "xrp", "usd coin", "cardano", "dogecoin", "avalanche",
+  "toncoin", "shiba inu", "polkadot", "tron", "chainlink", "polygon", "uniswap", "litecoin", "internet computer", "bitcoin cash"
+];
+
+function simulateInput(input, text) {
+  const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+  setter.call(input, text);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+async function sendLikeHuman(message) {
+  simulateInput(input, message);
+  console.log(`⌨️ [${new Date().toLocaleTimeString()}] 입력됨: ${message}`);
+
+  await new Promise(r => setTimeout(r, 1000));
+
+  const maxWait = 5000;
+  const interval = 250;
+  let waited = 0;
+
+  while (sendBtn.disabled && waited < maxWait) {
+    await new Promise(r => setTimeout(r, interval));
+    waited += interval;
+  }
+
+  if (!sendBtn.disabled) {
+    sendBtn.click();
+    console.log(`✅ [${new Date().toLocaleTimeString()}] 전송됨: ${message}`);
+  } else {
+    console.warn("❌ 버튼 5초 내 활성화되지 않음...");
+  }
+}
+
+// ✅ 최대한 서버 안정 시간 확보 → 65초 권장
+const DELAY = 65 * 1000;
+
+async function startBot() {
+  for (let i = 0; i < coins.length; i++) {
+    await sendLikeHuman(`price of ${coins[i]}`);
+    await new Promise(r => setTimeout(r, DELAY));
+  }
+
+  console.log("🚀 20개 전송 완료 – 내일 다시 붙여넣기 해주세요!");
+}
+
+// 실행
+startBot();
